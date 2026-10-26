@@ -1,0 +1,188 @@
+:root {
+  --bg: #fafafa;
+  --fg: #1a1a1f;
+  --muted: #6b6b76;
+  --border: rgba(0, 0, 0, 0.08);
+  --sel: rgba(0, 0, 0, 0.07);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1e1e26;
+    --fg: #e6e6ee;
+    --muted: #9a9aa8;
+    --border: rgba(255, 255, 255, 0.09);
+    --sel: rgba(255, 255, 255, 0.08);
+  }
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+#app.with-sidebar {
+  display: flex;
+}
+
+#app.with-sidebar #editor {
+  height: auto;
+  flex: 1;
+  min-width: 0;
+}
+
+#sidebar {
+  width: 230px;
+  flex-shrink: 0;
+  height: 100dvh;
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+  padding: 0.75rem 0 1.5rem;
+  box-sizing: border-box;
+}
+
+#sidebar-toggle {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  z-index: 5;
+}
+
+#sidebar-toggle:hover {
+  background: var(--sel);
+  color: var(--fg);
+}
+
+#sidebar-toggle svg {
+  transition: transform 0.15s ease;
+}
+
+#sidebar-toggle.collapsed svg {
+  transform: rotate(180deg);
+}
+
+#app.sidebar-collapsed #sidebar {
+  display: none;
+}
+
+#sidebar-title {
+  padding: 0.25rem 0.9rem 0.5rem 2.7rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-item {
+  display: block;
+  width: calc(100% - 1rem);
+  margin: 1px 0.5rem;
+  padding: 0.4rem 0.45rem;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--fg);
+  font: inherit;
+  font-size: 0.88rem;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-item:hover:not(:disabled) {
+  background: var(--sel);
+}
+
+.sidebar-item.selected {
+  background: var(--sel);
+  font-weight: 600;
+}
+
+.sidebar-item.other {
+  color: var(--muted);
+  opacity: 0.55;
+}
+
+.sidebar-item:disabled {
+  cursor: default;
+}
+
+#txtview {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+#editor.view-txt > .milkdown {
+  display: none;
+}
+
+#editor {
+  height: 100dvh;
+  overflow-y: auto;
+}
+
+#editor > * {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 3rem 2rem 6rem;
+  box-sizing: border-box;
+}
+
+#welcome {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+#welcome h1 {
+  margin: 0 0 0.75rem;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+#welcome p {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+}
+
+#status {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 80vw;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  background: rgba(20, 20, 26, 0.75);
+  color: #f0f0f5;
+  font-size: 0.85rem;
+  z-index: 10;
+}

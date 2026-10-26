@@ -1,0 +1,14 @@
+@import '@milkdown/crepe/theme/common/style.css';
+@import '@milkdown/crepe/theme/classic.css';
+@import '@milkdown/crepe/theme/classic-dark.css' (prefers-color-scheme: dark);
+
+.milkdown {
+  background: transparent;
+  color: inherit;
+  height: 100%;
+}
+
+.milkdown .ProseMirror {
+  padding: 0;
+  min-height: 100%;
+}
