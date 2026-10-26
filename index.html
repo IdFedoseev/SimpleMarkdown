@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reader — Markdown, already rendered</title>
+    <meta
+      name="description"
+      content="Reader for macOS opens .md files as finished documents — and lets you edit the page itself, Notion-style. Free and open source."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231A1B1E'/%3E%3Ctext x='32' y='43' font-family='monospace' font-size='28' fill='%23FFE24A' text-anchor='middle'%3Emd%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body id="top">
+    <header class="nav">
+      <a class="brand" href="#top">Reader<span class="brand-ext">.md</span></a>
+      <nav>
+        <a href="#edit">Edit</a>
+        <a href="#files">Files</a>
+        <a href="#download">Download</a>
+        <a href="https://github.com/IdFedoseev/SimpleMarkdown" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <h1>Open Markdown.<br />See a document.</h1>
+        <p class="lede">
+          Reader for macOS renders <code>.md</code> files the moment they open — no raw syntax, no
+          preview toggle. Need a change? Edit the page itself, Notion-style, and it saves back to
+          plain Markdown. Free and open source.
+        </p>
+        <p class="cta-row">
+          <a class="btn btn-primary" href="https://github.com/IdFedoseev/SimpleMarkdown/releases"
+            >Download for Mac</a
+          >
+          <a class="btn btn-ghost" href="https://github.com/IdFedoseev/SimpleMarkdown" target="_blank" rel="noopener"
+            >View source</a
+          >
+        </p>
+
+        <figure class="window">
+          <div class="chrome">
+            <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="wtitle"><i class="unsaved" title="Unsaved changes"></i>release-notes.md</span>
+          </div>
+          <div class="window-body">
+            <aside class="sidebar" aria-hidden="true">
+              <span class="side-label">notes/</span>
+              <span>readme.md</span>
+              <span class="active">release-notes.md</span>
+              <span>roadmap.md</span>
+              <span>todo.txt</span>
+            </aside>
+            <div class="stage" id="stage">
+              <pre class="layer raw" id="raw" aria-hidden="true"></pre>
+              <article class="layer rendered">
+                <h3>Release notes</h3>
+                <p><strong>Reader 1.0</strong> is out.</p>
+                <ul>
+                  <li>Opens <code>.md</code> as a document</li>
+                  <li>Edit text <mark>in place</mark></li>
+                  <li>Free, MIT</li>
+                </ul>
+                <blockquote>No raw markdown. Ever.</blockquote>
+              </article>
+              <button class="replay" id="replay" type="button" title="Replay">↻</button>
+            </div>
+          </div>
+        </figure>
+      </section>
+
+      <section class="section" id="edit">
+        <h2>Edit the page, not the source</h2>
+        <p>
+          Select any text and a toolbar appears — bold, italics, code, links. Type
+          <code>/</code> for a menu of blocks. What you touch is the finished document; what lands
+          on disk is still clean Markdown. The round-trip is lossless.
+        </p>
+        <figure class="inline-edit" aria-hidden="true">
+          <div class="mini-toolbar">
+            <span><b>B</b></span><span><i>I</i></span><span><code>`</code></span><span>Link</span>
+          </div>
+          <p>The quick brown fox fixes a <mark>typo</mark> in place.</p>
+        </figure>
+      </section>
+
+      <section class="section" id="files">
+        <h2>Whole folders, one window</h2>
+        <p>Drop a file or an entire folder anywhere on the window.</p>
+        <ul class="rows">
+          <li>
+            <span class="term">Sidebar browsing</span>
+            <span>every file one click away; <kbd>⌘\</kbd> hides it when you want width.</span>
+          </li>
+          <li>
+            <span class="term">Search</span>
+            <span><kbd>⌘F</kbd> highlights every match with a counter and next/prev; <kbd>Esc</kbd> closes.</span>
+          </li>
+          <li>
+            <span class="term">Autosave</span>
+            <span>changes save themselves — an unsaved dot in the title bar tells the truth.</span>
+          </li>
+          <li>
+            <span class="term">System default</span>
+            <span>make Reader the editor for Markdown files; double-click just works.</span>
+          </li>
+          <li>
+            <span class="term">Formats</span>
+            <span><code>.md</code>, <code>.markdown</code>, <code>.mdown</code>, <code>.mkd</code>, <code>.txt</code>.</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="section" id="steps">
+        <h2>Three steps to your first document</h2>
+        <ol class="steps">
+          <li>
+            <h3>Drop any <code>.md</code> file onto Reader</h3>
+            <p>Or press <kbd>⌘O</kbd>, or just double-click it in Finder.</p>
+          </li>
+          <li>
+            <h3>It opens rendered</h3>
+            <p>Like a PDF, not a text file full of asterisks.</p>
+          </li>
+          <li>
+            <h3>Click into the text and type</h3>
+            <p>That is the whole tutorial.</p>
+          </li>
+        </ol>
+      </section>
+
+      <section class="section free" id="download">
+        <h2>Free, open source, forever</h2>
+        <div class="free-row">
+          <p class="price">$0</p>
+          <div>
+            <p>
+              No price tag, no trial timer, no locked features. Reader is MIT-licensed and
+              lightweight: the source is on GitHub, and builds live in Releases.
+            </p>
+            <p class="cta-row">
+              <a class="btn btn-primary" href="https://github.com/IdFedoseev/SimpleMarkdown/releases"
+                >Download for Mac</a
+              >
+              <a class="btn btn-ghost" href="https://github.com/IdFedoseev/SimpleMarkdown" target="_blank" rel="noopener"
+                >Read the source</a
+              >
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="faq">
+        <h2>Questions</h2>
+        <details>
+          <summary>How is Reader different from other Markdown viewers?</summary>
+          <p>
+            Most Mac viewers are read-only. Reader treats the rendered page as the editor: you fix
+            and restructure in place, and the file stays plain Markdown.
+          </p>
+        </details>
+        <details>
+          <summary>Will it mangle my files?</summary>
+          <p>
+            No. The editor round-trips Markdown — formatting is stored as the same syntax you
+            would type by hand.
+          </p>
+        </details>
+        <details>
+          <summary>What does it cost?</summary>
+          <p>Nothing. MIT license, forever.</p>
+        </details>
+        <details>
+          <summary>Which systems does it run on?</summary>
+          <p>macOS. Reader is lightweight — it opens instantly and stays out of the way.</p>
+        </details>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>Reader — Markdown, already rendered.</span>
+      <span class="muted">Free software, MIT</span>
+    </footer>
+
+    <script src="demo.js"></script>
+  </body>
+</html>
