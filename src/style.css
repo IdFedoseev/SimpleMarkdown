@@ -160,6 +160,65 @@ body {
   text-align: center;
   cursor: pointer;
   user-select: none;
+  overflow: hidden;
+}
+
+#recent-cloud {
+  position: relative;
+  width: min(720px, 88vw);
+  margin-top: 3rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px 44px;
+}
+
+#recent-cloud.floating {
+  display: block;
+}
+
+.recent-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.05rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fg) 5%, transparent);
+  color: var(--fg);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: grab;
+  touch-action: none;
+}
+
+.recent-chip:active {
+  cursor: grabbing;
+}
+
+#recent-cloud.floating .recent-chip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
+.recent-chip:hover {
+  background: var(--sel);
+  border-color: color-mix(in srgb, var(--fg) 25%, transparent);
+}
+
+.recent-chip svg {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.recent-chip.folder svg {
+  color: #d59a2b;
+}
+
+.recent-name {
+  white-space: nowrap;
 }
 
 #welcome h1 {

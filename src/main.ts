@@ -4,6 +4,8 @@ import { getCurrentWebview } from '@tauri-apps/api/webview';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { createEditor, type EditorHandle } from './editor';
 import { type DirEntry, listDir, loadFile, openFileDialog, openFolderDialog, saveFile } from './fileio';
+import { pushRecent, type RecentEntry } from './recents';
+import { hideWelcome, showWelcome } from './welcome';
 import { initSearch } from './search';
 import './style.css';
 
@@ -59,26 +61,6 @@ function showStatus(message: string): void {
   statusTimer = window.setTimeout(() => document.getElementById('status')?.remove(), 4000);
 }
 
-function showWelcome(): void {
-  hideWelcome();
-  const el = document.createElement('div');
-  el.id = 'welcome';
-  const title = document.createElement('h1');
-  title.textContent = 'Откройте Markdown-файл';
-  const hint1 = document.createElement('p');
-  hint1.textContent = '⌘O — открыть файл';
-  const hint2 = document.createElement('p');
-  hint2.textContent = '⌘⇧O — открыть папку';
-  const hint3 = document.createElement('p');
-  hint3.textContent = 'или перетащите файл/папку в окно';
-  el.append(title, hint1, hint2, hint3);
-  el.addEventListener('click', () => void openFromDialog());
-  app.appendChild(el);
-}
-
-function hideWelcome(): void {
-  document.getElementById('welcome')?.remove();
-}
 
 function updateTitle(): void {
   const name = currentPath?.split('/').pop();
@@ -117,6 +99,7 @@ async function openPath(path: string): Promise<void> {
     }
     currentPath = path;
     dirty = false;
+    pushRecent(path, false);
     hideWelcome();
     updateTitle();
     updateSidebarSelection();
@@ -140,6 +123,7 @@ async function openTxt(path: string): Promise<void> {
     editorEl.classList.add('view-txt');
     currentPath = path;
     dirty = false;
+    pushRecent(path, false);
     hideWelcome();
     updateTitle();
     updateSidebarSelection();
@@ -158,6 +142,7 @@ async function openFolder(dir: string): Promise<void> {
     };
     files.sort((a, b) => kindRank(a) - kindRank(b) || a.name.localeCompare(b.name));
     folderPath = dir;
+    pushRecent(dir, true);
     buildSidebar(files);
     app.classList.add('with-sidebar');
     sidebarToggle.hidden = false;
@@ -217,6 +202,12 @@ function updateSidebarSelection(): void {
   });
 }
 
+function openRecent(entry: RecentEntry): void {
+  if (mdExt.test(entry.path)) void openPath(entry.path);
+  else if (txtExt.test(entry.path)) void openTxt(entry.path);
+  else void openFolder(entry.path);
+}
+
 async function openFromDialog(): Promise<void> {
   const path = await openFileDialog();
   if (path) void openPath(path);
@@ -270,9 +261,9 @@ async function start(): Promise<void> {
   try {
     const pending = await invoke<string | null>('take_pending_file');
     if (pending) void openPath(pending);
-    else showWelcome();
+    else showWelcome(() => void openFromDialog(), openRecent);
   } catch {
-    showWelcome();
+    showWelcome(() => void openFromDialog(), openRecent);
   }
   await listen<{ path: string }>('open-file', (e) => {
     if (e.payload.path !== currentPath) void openPath(e.payload.path);
