@@ -12,3 +12,8 @@
   padding: 0;
   min-height: 100%;
 }
+
+.milkdown .milkdown-code-block .preview svg {
+  max-width: 100%;
+  height: auto;
+}
