@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { loadRecents, pushRecent } from './recents';
+import { clearRecents, loadRecents, pushRecent, removeRecent } from './recents';
 
 beforeEach(() => {
   localStorage.clear();
@@ -23,6 +23,20 @@ describe('recents', () => {
     expect(list).toHaveLength(12);
     expect(list[0].path).toBe('/f19.md');
     expect(list[11].path).toBe('/f8.md');
+  });
+
+  it('удаляет запись по пути, не трогая остальные', () => {
+    pushRecent('/notes/one.md', false);
+    pushRecent('/books', true);
+    removeRecent('/notes/one.md');
+    expect(loadRecents()).toEqual([{ path: '/books', name: 'books', isFolder: true }]);
+  });
+
+  it('полностью очищает список недавних', () => {
+    pushRecent('/notes/one.md', false);
+    pushRecent('/books', true);
+    clearRecents();
+    expect(loadRecents()).toEqual([]);
   });
 
   it('терпит битый JSON в localStorage', () => {

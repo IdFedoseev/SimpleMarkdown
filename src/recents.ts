@@ -26,6 +26,23 @@ export function loadRecents(): RecentEntry[] {
   }
 }
 
+export function removeRecent(path: string): void {
+  const list = loadRecents().filter((e) => e.path !== path);
+  try {
+    localStorage.setItem(KEY, JSON.stringify(list));
+  } catch {
+    // best-effort, same as pushRecent
+  }
+}
+
+export function clearRecents(): void {
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    // best-effort, same as pushRecent
+  }
+}
+
 export function pushRecent(path: string, isFolder: boolean): void {
   const name = path.split('/').pop() || path;
   const list = loadRecents().filter((e) => e.path !== path);

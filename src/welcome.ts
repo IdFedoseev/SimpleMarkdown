@@ -1,9 +1,11 @@
-import { type RecentEntry, loadRecents } from './recents';
+import { type RecentEntry, clearRecents, loadRecents, removeRecent } from './recents';
 
 const fileIcon =
   '<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M9 1.5H4.5A1.5 1.5 0 0 0 3 3v10a1.5 1.5 0 0 0 1.5 1.5h7A1.5 1.5 0 0 0 13 13V5.5L9 1.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 1.5V5.5h4" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
 const folderIcon =
   '<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M1.75 4.25A1.25 1.25 0 0 1 3 3h3.2l1.3 1.75H13a1.25 1.25 0 0 1 1.25 1.25v6A1.25 1.25 0 0 1 13 13.25H3a1.25 1.25 0 0 1-1.25-1.25v-7.75Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
+const trashIcon =
+  '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2.5 4.5h11M6.5 2.5h3M4 4.5l.7 8a1.2 1.2 0 0 0 1.2 1.1h4.2a1.2 1.2 0 0 0 1.2-1.1l.7-8M6.75 7.5v4M9.25 7.5v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 interface Particle {
   el: HTMLElement;
@@ -61,6 +63,19 @@ export function showWelcome(
   if (recents.length > 0) {
     cloud = document.createElement('div');
     cloud.id = 'recent-cloud';
+    const clearBtn = document.createElement('button');
+    clearBtn.id = 'clear-recents';
+    clearBtn.innerHTML = `${trashIcon}<span>Очистить недавние</span>`;
+    const dismissCloud = (): void => {
+      particles.length = 0;
+      cloud!.remove();
+      clearBtn.remove();
+    };
+    clearBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      clearRecents();
+      dismissCloud();
+    });
     particles = recents.map((entry) => {
       const chip = document.createElement('button');
       chip.className = `recent-chip${entry.isFolder ? ' folder' : ''}`;
@@ -75,10 +90,25 @@ export function showWelcome(
         }
         onOpenRecent(entry);
       });
+      const particle: Particle = { el: chip, hw: 0, hh: 0, ax: 0, ay: 0, x: 0, y: 0, vx: 0, vy: 0, pinned: false };
+      const remove = document.createElement('span');
+      remove.className = 'recent-remove';
+      remove.title = 'Убрать из недавних';
+      remove.textContent = '×';
+      remove.addEventListener('pointerdown', (e) => e.stopPropagation());
+      remove.addEventListener('click', (e) => {
+        e.stopPropagation();
+        removeRecent(entry.path);
+        particles.splice(particles.indexOf(particle), 1);
+        chip.remove();
+        if (particles.length === 0) dismissCloud();
+      });
+      chip.appendChild(remove);
       cloud!.appendChild(chip);
-      return { el: chip, hw: 0, hh: 0, ax: 0, ay: 0, x: 0, y: 0, vx: 0, vy: 0, pinned: false };
+      return particle;
     });
     el.appendChild(cloud);
+    el.appendChild(clearBtn);
   }
 
   el.addEventListener('click', () => onOpenDialog());
