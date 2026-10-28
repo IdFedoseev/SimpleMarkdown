@@ -3,7 +3,7 @@ import { listen } from '@tauri-apps/api/event';
 import { getCurrentWebview } from '@tauri-apps/api/webview';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { createEditor, type EditorHandle } from './editor';
-import { type DirEntry, listDir, loadFile, openFileDialog, openFolderDialog, saveFile } from './fileio';
+import { type DirEntry, type FileMeta, fileMeta, listDir, loadFile, openFileDialog, openFolderDialog, saveFile } from './fileio';
 import { pushRecent, type RecentEntry } from './recents';
 import { hideWelcome, showWelcome } from './welcome';
 import { initSearch } from './search';
@@ -27,6 +27,7 @@ let folderPath: string | null = null;
 let sidebarCollapsed = false;
 let editor: EditorHandle | null = null;
 let dirty = false;
+let baseline: FileMeta | null = null;
 let saveTimer: number | undefined;
 
 const sidebarToggle = document.createElement('button');
@@ -73,6 +74,7 @@ async function flushSave(): Promise<void> {
   try {
     await saveFile(currentPath, editor.getMarkdown());
     dirty = false;
+    baseline = await fileMeta(currentPath).catch(() => baseline);
     updateTitle();
   } catch (err) {
     showStatus(`Не удалось сохранить: ${errText(err)}`);
@@ -92,6 +94,7 @@ async function openPath(path: string): Promise<void> {
     editorEl.classList.remove('view-txt');
     document.getElementById('txtview')?.setAttribute('hidden', '');
     const md = await loadFile(path);
+    baseline = await fileMeta(path).catch(() => null);
     if (!editor) {
       editor = await createEditor(editorEl, md, onDocChanged);
     } else {
@@ -112,6 +115,7 @@ async function openTxt(path: string): Promise<void> {
   try {
     if (editor && dirty) await flushSave();
     const text = await loadFile(path);
+    baseline = await fileMeta(path).catch(() => null);
     let pre = document.getElementById('txtview') as HTMLPreElement | null;
     if (!pre) {
       pre = document.createElement('pre');
@@ -221,6 +225,34 @@ async function openFolderFromDialog(): Promise<void> {
 function errText(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
+
+async function reloadIfChanged(): Promise<void> {
+  if (document.hidden || !currentPath || dirty || !baseline) return;
+  let meta: FileMeta;
+  try {
+    meta = await fileMeta(currentPath);
+  } catch {
+    return;
+  }
+  if (meta.mtime === baseline.mtime && meta.size === baseline.size) return;
+  baseline = meta;
+  try {
+    const text = await loadFile(currentPath);
+    if (editorEl.classList.contains('view-txt')) {
+      const pre = document.getElementById('txtview');
+      if (pre) pre.textContent = text;
+    } else if (editor && text !== editor.getMarkdown()) {
+      await editor.setMarkdown(text);
+    }
+  } catch {
+    // file unreadable mid-edit; next poll retries
+  }
+}
+
+window.setInterval(() => void reloadIfChanged(), 2000);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) void reloadIfChanged();
+});
 
 window.addEventListener(
   'keydown',

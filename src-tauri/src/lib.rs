@@ -39,6 +39,18 @@ fn list_dir(path: String) -> Result<serde_json::Value, String> {
 }
 
 #[tauri::command]
+fn file_meta(path: String) -> Result<serde_json::Value, String> {
+    let meta = fs::metadata(&path).map_err(|e| e.to_string())?;
+    let mtime = meta
+        .modified()
+        .map_err(|e| e.to_string())?
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(|e| e.to_string())?
+        .as_millis() as u64;
+    Ok(serde_json::json!({ "mtime": mtime, "size": meta.len() }))
+}
+
+#[tauri::command]
 fn take_pending_file(state: State<PendingFile>) -> Option<String> {
     state.0.lock().unwrap().take()
 }
@@ -51,6 +63,7 @@ pub fn run() {
         read_file,
         write_file,
         list_dir,
+        file_meta,
         take_pending_file
     ])
         .build(tauri::generate_context!())

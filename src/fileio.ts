@@ -25,6 +25,15 @@ export function loadFile(path: string): Promise<string> {
   return invoke<string>('read_file', { path });
 }
 
+export interface FileMeta {
+  mtime: number;
+  size: number;
+}
+
+export function fileMeta(path: string): Promise<FileMeta> {
+  return invoke<FileMeta>('file_meta', { path });
+}
+
 export function saveFile(path: string, contents: string): Promise<void> {
   return invoke('write_file', { path, contents });
 }
