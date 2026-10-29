@@ -14,11 +14,15 @@ describe('mermaidPreview', () => {
     expect(apply).not.toHaveBeenCalled()
   })
 
-  it('renders mermaid and applies the svg', async () => {
+  it('renders mermaid and applies a preview with fullscreen button', async () => {
     const apply = vi.fn()
     vi.mocked(mermaid.render).mockResolvedValue({ svg: '<svg></svg>' } as never)
     mermaidPreview('mermaid', 'graph TD; A-->B', apply)
-    await vi.waitFor(() => expect(apply).toHaveBeenCalledWith('<svg></svg>'))
+    await vi.waitFor(() => expect(apply).toHaveBeenCalledTimes(1))
+    const el = apply.mock.calls[0][0] as HTMLElement
+    expect(el.className).toBe('diagram-preview')
+    expect(el.querySelector('svg')).toBeTruthy()
+    expect(el.querySelector('button.diagram-open')).toBeTruthy()
     expect(mermaid.render).toHaveBeenCalledWith(
       expect.stringMatching(/^reader-mermaid-/),
       'graph TD; A-->B',
