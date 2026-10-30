@@ -1,0 +1,71 @@
+#editor {
+  position: relative;
+}
+
+#editor > #draw-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+#editor.drawing > #draw-canvas {
+  pointer-events: auto;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+#draw-toggle {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  z-index: 5;
+}
+
+#draw-toggle:hover,
+#draw-toggle.active {
+  background: var(--sel);
+  color: var(--fg);
+}
+
+#draw-panel {
+  position: fixed;
+  top: 10px;
+  right: 44px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 0.75rem;
+  z-index: 5;
+}
+
+#draw-panel[hidden] {
+  display: none;
+}
+
+#draw-panel select {
+  font: inherit;
+  color: var(--fg);
+  background: none;
+  border: none;
+}
