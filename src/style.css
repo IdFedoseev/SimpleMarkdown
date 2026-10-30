@@ -23,14 +23,125 @@ body {
   color: var(--fg);
 }
 
-#app.with-sidebar {
+#app {
   display: flex;
 }
 
-#app.with-sidebar #editor {
-  height: auto;
+#content {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-width: 0;
+  height: 100dvh;
+}
+
+#tabbar {
+  display: flex;
+  gap: 2px;
+  padding: 4px 8px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+#tabbar:empty {
+  display: none;
+}
+
+#tabbar::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px;
+  flex: 0 1 auto;
+  min-width: 72px;
+  max-width: 180px;
+  border-radius: 7px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.tab-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab:hover {
+  background: var(--sel);
+  color: var(--fg);
+}
+
+.tab.active {
+  background: var(--sel);
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.tab:focus-visible {
+  outline: 1px solid var(--border);
+  outline-offset: -1px;
+}
+
+.tab-dot {
+  display: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fg);
+  flex-shrink: 0;
+}
+
+.tab.dirty .tab-dot {
+  display: block;
+}
+
+.tab.loading .tab-label {
+  opacity: 0.55;
+}
+
+.tab.loading .tab-dot {
+  display: block;
+  background: var(--muted);
+}
+
+.tab-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.tab.active .tab-close,
+.tab:hover .tab-close {
+  opacity: 1;
+}
+
+.tab-close:hover {
+  background: color-mix(in srgb, var(--fg) 12%, transparent);
+  color: var(--fg);
 }
 
 #sidebar {
@@ -76,6 +187,10 @@ body {
 
 #app.sidebar-collapsed #sidebar {
   display: none;
+}
+
+#app.sidebar-collapsed #tabbar {
+  padding-left: 46px;
 }
 
 #sidebar-title {
@@ -139,7 +254,8 @@ body {
 }
 
 #editor {
-  height: 100dvh;
+  flex: 1;
+  min-width: 0;
   overflow-y: auto;
 }
 
@@ -288,4 +404,11 @@ body {
   color: #f0f0f5;
   font-size: 0.85rem;
   z-index: 10;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab,
+  .tab-close {
+    transition: none;
+  }
 }
