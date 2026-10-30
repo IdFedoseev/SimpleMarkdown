@@ -8,7 +8,6 @@ import {
   restoreSession,
   setActive,
   setDirty,
-  setLoading,
   tabAt,
   tabCount,
 } from './tabs';
@@ -134,17 +133,13 @@ describe('tabs', () => {
     expect(document.querySelectorAll('.tab')).toHaveLength(1);
   });
 
-  it('отражает dirty и loading флаги в classList', () => {
+  it('отражает dirty флаг в classList', () => {
     setup();
     openTab('/a.md', 'md');
     setDirty('/a.md', true);
     expect(tabAt0().classList.contains('dirty')).toBe(true);
-    setLoading('/a.md', true);
-    expect(tabAt0().classList.contains('loading')).toBe(true);
     setDirty('/a.md', false);
-    setLoading('/a.md', false);
     expect(tabAt0().classList.contains('dirty')).toBe(false);
-    expect(tabAt0().classList.contains('loading')).toBe(false);
   });
 
   it('клик по вкладке активирует её и зовёт onActivate', () => {

@@ -5,7 +5,7 @@ import { getCurrentWindow } from '@tauri-apps/api/window';
 import { createEditor, type EditorHandle } from './editor';
 import { type DirEntry, type FileMeta, fileMeta, listDir, loadFile, openFileDialog, openFolderDialog, saveFile } from './fileio';
 import { pushRecent, type RecentEntry } from './recents';
-import { activeTab, closeTab, initTabs, neighborTab, openTab, restoreSession, setActive, setDirty, setLoading, tabAt, tabCount } from './tabs';
+import { activeTab, closeTab, initTabs, neighborTab, openTab, restoreSession, setActive, setDirty, tabAt, tabCount } from './tabs';
 import { hideWelcome, showWelcome } from './welcome';
 import { initSearch } from './search';
 import './style.css';
@@ -159,40 +159,35 @@ async function activateDoc(path: string): Promise<boolean> {
   if (path === currentPath) return true;
   const kind = kindOf(path);
   if (kind !== 'md' && kind !== 'txt') return false;
-  setLoading(path, true);
-  try {
-    if (editor && dirty && !(await flushSave())) {
-      if (currentPath !== null) setActive(currentPath);
-      return false;
-    }
-    if (gen !== activateGen) return true;
-    if (currentPath !== null) scrollPos.set(currentPath, editorEl.scrollTop);
-    loadDepth++;
-    let ok: boolean;
-    try {
-      ok = kind === 'md' ? await loadMdDoc(path, gen) : await loadTxtDoc(path, gen);
-    } finally {
-      loadDepth--;
-    }
-    if (gen !== activateGen) return true;
-    if (!ok) {
-      const name = path.split('/').pop() || path;
-      const gone = await fileMeta(path)
-        .then(() => false)
-        .catch(() => true);
-      showStatus(gone ? `Файл не найден: ${name}` : `Не удалось открыть: ${name}`);
-      if (gone) {
-        closeTab(path);
-        scrollPos.delete(path);
-      }
-      if (currentPath !== null) setActive(currentPath);
-      return false;
-    }
-    editorEl.scrollTop = scrollPos.get(path) ?? 0;
-    return true;
-  } finally {
-    if (gen === activateGen) setLoading(path, false);
+  if (editor && dirty && !(await flushSave())) {
+    if (currentPath !== null) setActive(currentPath);
+    return false;
   }
+  if (gen !== activateGen) return true;
+  if (currentPath !== null) scrollPos.set(currentPath, editorEl.scrollTop);
+  loadDepth++;
+  let ok: boolean;
+  try {
+    ok = kind === 'md' ? await loadMdDoc(path, gen) : await loadTxtDoc(path, gen);
+  } finally {
+    loadDepth--;
+  }
+  if (gen !== activateGen) return true;
+  if (!ok) {
+    const name = path.split('/').pop() || path;
+    const gone = await fileMeta(path)
+      .then(() => false)
+      .catch(() => true);
+    showStatus(gone ? `Файл не найден: ${name}` : `Не удалось открыть: ${name}`);
+    if (gone) {
+      closeTab(path);
+      scrollPos.delete(path);
+    }
+    if (currentPath !== null) setActive(currentPath);
+    return false;
+  }
+  editorEl.scrollTop = scrollPos.get(path) ?? 0;
+  return true;
 }
 
 async function activateOrDrop(path: string | null): Promise<void> {

@@ -22,7 +22,6 @@ let callbacks: TabCallbacks | null = null;
 let entries: TabEntry[] = [];
 let active: string | null = null;
 const dirtyPaths = new Set<string>();
-const loadingPaths = new Set<string>();
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -78,7 +77,6 @@ function buildTab(entry: TabEntry): HTMLElement {
   tab.setAttribute('aria-selected', entry.path === active ? 'true' : 'false');
   if (entry.path === active) tab.classList.add('active');
   if (dirtyPaths.has(entry.path)) tab.classList.add('dirty');
-  if (loadingPaths.has(entry.path)) tab.classList.add('loading');
   const label = document.createElement('span');
   label.className = 'tab-label';
   label.textContent = entry.path.split('/').pop() || entry.path;
@@ -121,7 +119,6 @@ export function initTabs(cb: TabCallbacks): void {
   entries = [];
   active = null;
   dirtyPaths.clear();
-  loadingPaths.clear();
   const bar = document.getElementById('tabbar');
   if (bar) {
     tabbar = bar;
@@ -160,20 +157,11 @@ export function setDirty(path: string, value: boolean): void {
   tabEl(path)?.classList.toggle('dirty', value);
 }
 
-export function setLoading(path: string, value: boolean): void {
-  if (!entries.some((t) => t.path === path)) return;
-  if (loadingPaths.has(path) === value) return;
-  if (value) loadingPaths.add(path);
-  else loadingPaths.delete(path);
-  tabEl(path)?.classList.toggle('loading', value);
-}
-
 export function closeTab(path: string): string | null {
   const index = entries.findIndex((t) => t.path === path);
   if (index === -1) return active;
   entries.splice(index, 1);
   dirtyPaths.delete(path);
-  loadingPaths.delete(path);
   if (active === path) {
     const right = entries[index];
     active = right ? right.path : (entries[index - 1]?.path ?? null);
@@ -187,7 +175,6 @@ export function restoreSession(): TabSession {
   entries = [];
   active = null;
   dirtyPaths.clear();
-  loadingPaths.clear();
   const session = readStored();
   entries = session.entries;
   active =

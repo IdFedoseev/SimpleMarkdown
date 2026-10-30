@@ -107,15 +107,6 @@ body {
   display: block;
 }
 
-.tab.loading .tab-label {
-  opacity: 0.55;
-}
-
-.tab.loading .tab-dot {
-  display: block;
-  background: var(--muted);
-}
-
 .tab-close {
   display: flex;
   align-items: center;
