@@ -261,7 +261,7 @@ body {
 }
 
 #editor > * {
-  max-width: 46rem;
+  max-width: min(70rem, 100% - 5rem);
   margin: 0 auto;
   padding: 3rem 2rem 6rem;
   box-sizing: border-box;
