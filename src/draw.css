@@ -46,7 +46,7 @@
 #draw-panel {
   position: fixed;
   top: 10px;
-  right: 44px;
+  right: 78px;
   display: flex;
   align-items: center;
   gap: 0.4rem;

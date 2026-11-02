@@ -1,11 +1,28 @@
 import { invoke } from '@tauri-apps/api/core';
-import { open } from '@tauri-apps/plugin-dialog';
+import { message, open, save } from '@tauri-apps/plugin-dialog';
 
 export function openFileDialog(): Promise<string | null> {
   return open({
     multiple: false,
     filters: [{ name: 'Markdown', extensions: ['md', 'markdown', 'mdown', 'mkd'] }],
   });
+}
+
+export function saveFileDialog(defaultName: string): Promise<string | null> {
+  return save({
+    defaultPath: defaultName,
+    filters: [{ name: 'Markdown', extensions: ['md'] }],
+  });
+}
+
+export function askSaveNote(name: string): Promise<'save' | 'discard' | 'cancel'> {
+  return message(`Сохранить заметку «${name}»?`, {
+    title: 'Несохранённая заметка',
+    kind: 'warning',
+    buttons: { yes: 'Сохранить', no: 'Не сохранять', cancel: 'Отмена' },
+  }).then((result) =>
+    result === 'Сохранить' ? 'save' : result === 'Не сохранять' ? 'discard' : 'cancel',
+  );
 }
 
 export interface DirEntry {

@@ -16,6 +16,15 @@ export interface TabCallbacks {
 }
 
 const STORAGE_KEY = 'reader:tabs';
+const UNTITLED_PREFIX = 'untitled:';
+
+export function isUntitledPath(path: string): boolean {
+  return path.startsWith(UNTITLED_PREFIX);
+}
+
+export function displayName(path: string): string {
+  return isUntitledPath(path) ? path.slice(UNTITLED_PREFIX.length) : (path.split('/').pop() || path);
+}
 
 let tabbar: HTMLElement | null = null;
 let callbacks: TabCallbacks | null = null;
@@ -47,7 +56,7 @@ function readStored(): TabSession {
       if (!isPlainObject(item)) continue;
       const { path, kind } = item;
       if (typeof path !== 'string' || path === '' || (kind !== 'md' && kind !== 'txt')) continue;
-      if (seen.has(path)) continue;
+      if (isUntitledPath(path) || seen.has(path)) continue;
       seen.add(path);
       valid.push({ path, kind });
     }
@@ -79,7 +88,7 @@ function buildTab(entry: TabEntry): HTMLElement {
   if (dirtyPaths.has(entry.path)) tab.classList.add('dirty');
   const label = document.createElement('span');
   label.className = 'tab-label';
-  label.textContent = entry.path.split('/').pop() || entry.path;
+  label.textContent = displayName(entry.path);
   const dot = document.createElement('span');
   dot.className = 'tab-dot';
   dot.setAttribute('aria-hidden', 'true');
@@ -169,6 +178,28 @@ export function closeTab(path: string): string | null {
   persist();
   render();
   return active;
+}
+
+export function rekeyTab(path: string, nextPath: string, kind: TabKind): void {
+  const entry = entries.find((t) => t.path === path);
+  if (!entry || path === nextPath) return;
+  for (let i = entries.length - 1; i >= 0; i--) {
+    if (entries[i].path === nextPath) entries.splice(i, 1);
+  }
+  entry.path = nextPath;
+  entry.kind = kind;
+  if (dirtyPaths.has(path)) {
+    dirtyPaths.delete(path);
+    dirtyPaths.add(nextPath);
+  }
+  if (active === path) active = nextPath;
+  persist();
+  render();
+  if (active === nextPath) scrollIntoActive();
+}
+
+export function untitledTabs(): TabEntry[] {
+  return entries.filter((t) => isUntitledPath(t.path));
 }
 
 export function restoreSession(): TabSession {

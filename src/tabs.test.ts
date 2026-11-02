@@ -2,14 +2,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   activeTab,
   closeTab,
+  displayName,
   initTabs,
+  isUntitledPath,
   neighborTab,
   openTab,
   restoreSession,
+  rekeyTab,
   setActive,
   setDirty,
   tabAt,
   tabCount,
+  untitledTabs,
 } from './tabs';
 
 function setup(): { onActivate: ReturnType<typeof vi.fn>; onClose: ReturnType<typeof vi.fn> } {
@@ -196,5 +200,36 @@ describe('tabs', () => {
     );
     expect(onClose).toHaveBeenCalledWith('/b.md');
     expect(onClose).toHaveBeenCalledTimes(2);
+  });
+
+  it('заметка: displayName без префикса, untitledTabs её видит, restore её отбрасывает', () => {
+    setup();
+    openTab('untitled:Заметка 1.md', 'md');
+    openTab('/a.md', 'md');
+    expect(isUntitledPath('untitled:Заметка 1.md')).toBe(true);
+    expect(isUntitledPath('/a/Заметка 1.md')).toBe(false);
+    expect(displayName('untitled:Заметка 1.md')).toBe('Заметка 1.md');
+    expect(displayName('/a/b/note.md')).toBe('note.md');
+    expect(tabAt0().textContent).toContain('Заметка 1.md');
+    expect(untitledTabs().map((t) => t.path)).toEqual(['untitled:Заметка 1.md']);
+    const session = restoreSession();
+    expect(session.entries).toEqual([{ path: '/a.md', kind: 'md' }]);
+    expect(session.active).toBe('/a.md');
+    expect(document.querySelectorAll('.tab')).toHaveLength(1);
+  });
+
+  it('rekeyTab переносит путь, dirty и активность, схлопывая дубликат', () => {
+    setup();
+    openTab('untitled:Заметка 1.md', 'md');
+    openTab('/a.md', 'md');
+    setActive('untitled:Заметка 1.md');
+    setDirty('untitled:Заметка 1.md', true);
+    rekeyTab('untitled:Заметка 1.md', '/a.md', 'md');
+    expect(tabCount()).toBe(1);
+    expect(activeTab()).toBe('/a.md');
+    expect(tabAt0().classList.contains('dirty')).toBe(true);
+    expect(JSON.parse(localStorage.getItem('reader:tabs')!).entries).toEqual([
+      { path: '/a.md', kind: 'md' },
+    ]);
   });
 });

@@ -3,9 +3,9 @@ import { listen } from '@tauri-apps/api/event';
 import { getCurrentWebview } from '@tauri-apps/api/webview';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { createEditor, type EditorHandle } from './editor';
-import { type DirEntry, type FileMeta, fileMeta, listDir, loadFile, openFileDialog, openFolderDialog, saveFile } from './fileio';
+import { askSaveNote, type DirEntry, type FileMeta, fileMeta, listDir, loadFile, openFileDialog, openFolderDialog, saveFileDialog, saveFile } from './fileio';
 import { pushRecent, type RecentEntry } from './recents';
-import { activeTab, closeTab, initTabs, neighborTab, openTab, restoreSession, setActive, setDirty, tabAt, tabCount } from './tabs';
+import { activeTab, closeTab, displayName, initTabs, isUntitledPath, neighborTab, openTab, restoreSession, rekeyTab, setActive, setDirty, tabAt, tabCount, type TabKind, untitledTabs } from './tabs';
 import { hideWelcome, showWelcome } from './welcome';
 import { initSearch } from './search';
 import './style.css';
@@ -33,6 +33,8 @@ let saveTimer: number | undefined;
 const scrollPos = new Map<string, number>();
 let activateGen = 0;
 let loadDepth = 0;
+let untitledSeq = 0;
+const untitledContent = new Map<string, string>();
 
 const sidebarToggle = document.createElement('button');
 sidebarToggle.id = 'sidebar-toggle';
@@ -42,6 +44,15 @@ sidebarToggle.innerHTML =
 sidebarToggle.hidden = true;
 sidebarToggle.addEventListener('click', () => toggleSidebar());
 document.body.appendChild(sidebarToggle);
+
+const newNoteBtn = document.createElement('button');
+newNoteBtn.id = 'new-note';
+newNoteBtn.title = 'Новая заметка (⌘N)';
+newNoteBtn.setAttribute('aria-label', 'Новая заметка');
+newNoteBtn.innerHTML =
+  '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+newNoteBtn.addEventListener('click', () => void newNote());
+document.body.appendChild(newNoteBtn);
 
 function toggleSidebar(): void {
   if (!folderPath) return;
@@ -73,13 +84,16 @@ function showStatus(message: string): void {
 
 
 function updateTitle(): void {
-  const name = currentPath?.split('/').pop();
+  const name = currentPath === null ? null : displayName(currentPath);
   void win.setTitle(name ? (dirty ? `• ${name}` : name) : 'Reader');
 }
 
 async function flushSave(): Promise<boolean> {
   window.clearTimeout(saveTimer);
   if (!currentPath || !editor || !dirty) return true;
+  if (isUntitledPath(currentPath)) {
+    return (await saveUntitledAs(currentPath, editor.getMarkdown())) !== null;
+  }
   try {
     await saveFile(currentPath, editor.getMarkdown());
     dirty = false;
@@ -99,13 +113,15 @@ function onDocChanged(): void {
   if (currentPath) setDirty(currentPath, true);
   updateTitle();
   window.clearTimeout(saveTimer);
-  saveTimer = window.setTimeout(() => void flushSave(), 700);
+  if (currentPath !== null && !isUntitledPath(currentPath)) {
+    saveTimer = window.setTimeout(() => void flushSave(), 700);
+  }
 }
 
 function applyDocOpened(path: string): void {
   currentPath = path;
   dirty = false;
-  pushRecent(path, false);
+  if (!isUntitledPath(path)) pushRecent(path, false);
   hideWelcome();
   updateTitle();
   updateSidebarSelection();
@@ -126,6 +142,29 @@ async function loadMdDoc(path: string, gen: number): Promise<boolean> {
     }
     if (gen !== activateGen) return false;
     applyDocOpened(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function loadUntitledDoc(path: string, gen: number): Promise<boolean> {
+  try {
+    if (gen !== activateGen) return false;
+    baseline = null;
+    const md = untitledContent.get(path) ?? '';
+    editorEl.classList.remove('view-txt');
+    document.getElementById('txtview')?.setAttribute('hidden', '');
+    if (!editor) {
+      editor = await createEditor(editorEl, md, onDocChanged);
+    } else {
+      await editor.setMarkdown(md);
+    }
+    if (gen !== activateGen) return false;
+    applyDocOpened(path);
+    dirty = md.trim() !== '';
+    if (dirty) setDirty(path, true);
+    updateTitle();
     return true;
   } catch {
     return false;
@@ -159,7 +198,9 @@ async function activateDoc(path: string): Promise<boolean> {
   if (path === currentPath) return true;
   const kind = kindOf(path);
   if (kind !== 'md' && kind !== 'txt') return false;
-  if (editor && dirty && !(await flushSave())) {
+  if (currentPath !== null && isUntitledPath(currentPath)) {
+    if (editor) untitledContent.set(currentPath, editor.getMarkdown());
+  } else if (editor && dirty && !(await flushSave())) {
     if (currentPath !== null) setActive(currentPath);
     return false;
   }
@@ -168,7 +209,11 @@ async function activateDoc(path: string): Promise<boolean> {
   loadDepth++;
   let ok: boolean;
   try {
-    ok = kind === 'md' ? await loadMdDoc(path, gen) : await loadTxtDoc(path, gen);
+    ok = isUntitledPath(path)
+      ? await loadUntitledDoc(path, gen)
+      : kind === 'md'
+        ? await loadMdDoc(path, gen)
+        : await loadTxtDoc(path, gen);
   } finally {
     loadDepth--;
   }
@@ -214,16 +259,73 @@ async function openDoc(path: string): Promise<void> {
   await activateOrDrop(path);
 }
 
+async function newNote(): Promise<void> {
+  const path = `untitled:Заметка ${++untitledSeq}.md`;
+  untitledContent.set(path, '');
+  openTab(path, 'md');
+  await activateOrDrop(path);
+}
+
+async function saveUntitledAs(path: string, contents: string): Promise<string | null> {
+  const target = await saveFileDialog(displayName(path));
+  if (!target) return null;
+  try {
+    await saveFile(target, contents);
+  } catch (err) {
+    showStatus(`Не удалось сохранить: ${errText(err)}`);
+    return null;
+  }
+  untitledContent.delete(path);
+  const wasActive = currentPath === path;
+  const kind: TabKind = kindOf(target) === 'txt' ? 'txt' : 'md';
+  rekeyTab(path, target, kind);
+  setDirty(target, false);
+  if (wasActive) {
+    currentPath = target;
+    dirty = false;
+    baseline = await fileMeta(target).catch(() => null);
+    updateTitle();
+    updateSidebarSelection();
+  }
+  pushRecent(target, false);
+  return target;
+}
+
+async function saveUntitledOnQuit(): Promise<boolean> {
+  for (const tab of untitledTabs()) {
+    const content =
+      tab.path === currentPath && editor ? editor.getMarkdown() : (untitledContent.get(tab.path) ?? '');
+    if (content.trim() === '') continue;
+    const choice = await askSaveNote(displayName(tab.path));
+    if (choice === 'cancel') return false;
+    if (choice === 'save' && (await saveUntitledAs(tab.path, content)) === null) return false;
+  }
+  return true;
+}
+
 async function closeTabByUser(path: string): Promise<void> {
   if (path !== currentPath) {
+    untitledContent.delete(path);
     closeTab(path);
     scrollPos.delete(path);
     return;
   }
-  if (!(await flushSave())) return;
+  let closing = path;
+  if (isUntitledPath(path)) {
+    const content = editor?.getMarkdown() ?? '';
+    if (content.trim() !== '') {
+      const choice = await askSaveNote(displayName(path));
+      if (choice === 'cancel') return;
+      if (choice === 'save') {
+        const saved = await saveUntitledAs(path, content);
+        if (!saved) return;
+        closing = saved;
+      }
+    }
+  } else if (!(await flushSave())) return;
   scrollPos.delete(path);
   currentPath = null;
-  const next = closeTab(path);
+  const next = closeTab(closing);
   if (next !== null) await activateOrDrop(next);
   if (tabCount() === 0) showWelcome(() => void openFromDialog(), openRecent);
   updateTitle();
@@ -366,7 +468,10 @@ window.addEventListener(
       if (path) void selectTab(path);
       return;
     }
-    if (e.key === 'o' || e.key === 'O') {
+    if (e.key === 'n' || e.key === 'N') {
+      e.preventDefault();
+      void newNote();
+    } else if (e.key === 'o' || e.key === 'O') {
       e.preventDefault();
       if (e.shiftKey) void openFolderFromDialog();
       else void openFromDialog();
@@ -396,7 +501,8 @@ void getCurrentWebview().onDragDropEvent((e) => {
 
 void win.onCloseRequested(async (e) => {
   e.preventDefault();
-  await flushSave();
+  if (currentPath !== null && !isUntitledPath(currentPath) && !(await flushSave())) return;
+  if (!(await saveUntitledOnQuit())) return;
   await win.destroy();
 });
 

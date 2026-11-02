@@ -54,8 +54,10 @@ export function showWelcome(
   const hint2 = document.createElement('p');
   hint2.textContent = '⌘⇧O — открыть папку';
   const hint3 = document.createElement('p');
-  hint3.textContent = 'или перетащите файл/папку в окно';
-  el.append(title, hint1, hint2, hint3);
+  hint3.textContent = '⌘N — новая заметка';
+  const hint4 = document.createElement('p');
+  hint4.textContent = 'или перетащите файл/папку в окно';
+  el.append(title, hint1, hint2, hint3, hint4);
 
   let cloud: HTMLElement | null = null;
   let particles: Particle[] = [];
