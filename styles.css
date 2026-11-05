@@ -731,40 +731,6 @@ h2 {
   background: #58c274;
 }
 
-/* start screen chips */
-
-.cloud {
-  position: relative;
-  height: 16rem;
-  margin: 2.5rem 0 0;
-}
-
-.fchip {
-  position: absolute;
-  font: 400 0.82rem var(--mono);
-  border: 1px solid var(--hairline);
-  border-radius: 8px;
-  background: #fff;
-  padding: 0.4rem 0.85rem;
-  box-shadow: 0 4px 10px -6px rgba(26, 27, 30, 0.25);
-}
-
-.fchip.lift {
-  border-color: #d8d8d2;
-  box-shadow: 0 18px 32px -14px rgba(26, 27, 30, 0.4);
-  scale: 1.06;
-}
-
-.cloud .fchip:nth-child(1) { left: 4%; top: 16%; rotate: -4deg; }
-.cloud .fchip:nth-child(2) { left: 24%; top: 4%; rotate: 2deg; }
-.cloud .fchip:nth-child(3) { left: 54%; top: 10%; rotate: -2deg; }
-.cloud .fchip:nth-child(4) { left: 78%; top: 6%; rotate: 4deg; }
-.cloud .fchip:nth-child(5) { left: 5%; top: 60%; rotate: 3deg; }
-.cloud .fchip:nth-child(6) { left: 36%; top: 44%; rotate: -3deg; }
-.cloud .fchip:nth-child(7) { left: 63%; top: 62%; rotate: 5deg; }
-.cloud .fchip:nth-child(8) { left: 80%; top: 36%; rotate: -6deg; }
-
-/* feature rows */
 
 .rows {
   display: grid;
@@ -950,10 +916,6 @@ details p {
 
   .fline {
     width: 2.2rem;
-  }
-
-  .cloud {
-    height: 12rem;
   }
 
   .rows {
