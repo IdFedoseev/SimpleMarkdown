@@ -220,7 +220,41 @@ h1 {
   height: 8px;
   border-radius: 50%;
   background: var(--mark);
-  margin-right: 0.45em;
+}
+
+/* tab bar (hero window + tab strip figure) */
+
+.tabbar {
+  display: flex;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font: 400 0.78rem var(--mono);
+  color: var(--muted);
+  border-right: 1px solid var(--hairline);
+}
+
+.tab:last-child {
+  border-right: 0;
+}
+
+.tab.active {
+  background: var(--code-bg);
+  color: var(--ink);
+}
+
+.tab .unsaved {
+  margin-left: 0.45em;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tab .unsaved.on {
+  opacity: 1;
 }
 
 .window-body {
@@ -378,12 +412,11 @@ h2 {
   margin: 0 0 1rem;
 }
 
-h2::before {
-  content: "## ";
+.h2-prefix {
   font: 500 0.55em var(--mono);
   color: var(--muted);
   vertical-align: 0.4em;
-  margin-right: 0.25em;
+  margin-right: 0.4em;
 }
 
 .section > p {
@@ -404,6 +437,12 @@ h2::before {
 .inline-edit p {
   margin: 0;
   font-size: 1.05rem;
+}
+
+.inline-edit .card-note {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 .mini-toolbar {
@@ -439,24 +478,310 @@ h2::before {
   padding: 0;
 }
 
-/* feature rows */
-
-.rows {
-  list-style: none;
-  margin: 1.5rem 0 0;
-  padding: 0;
+.slash-pop {
+  position: absolute;
+  top: 2rem;
+  right: 1.9rem;
+  width: 9.5rem;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 6px 18px -8px rgba(26, 27, 30, 0.3);
+  overflow: hidden;
 }
 
-.rows li {
+.sp-head {
+  display: block;
+  padding: 0.3rem 0.7rem;
+  font: 500 0.85rem var(--mono);
+  color: var(--muted);
+  background: var(--code-bg);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.sp-item {
   display: flex;
-  gap: 1rem;
-  padding: 0.9rem 0;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.32rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+.sp-item + .sp-item {
   border-top: 1px solid var(--hairline);
 }
 
-.rows .term {
-  flex: 0 0 9.5rem;
+.sp-item i {
+  font: 400 0.72rem var(--mono);
+  font-style: normal;
+  color: var(--muted);
+}
+
+/* tab strip figure */
+
+.tabstrip {
+  margin: 2.5rem 0 0;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 24px 60px -30px rgba(26, 27, 30, 0.25);
+  overflow: hidden;
+}
+
+.skel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.1rem 1.6rem 1.3rem;
+}
+
+.skel i {
+  display: block;
+  height: 0.55rem;
+  border-radius: 0.3rem;
+  background: var(--code-bg);
+  width: 68%;
+}
+
+.skel i:nth-child(2) {
+  width: 42%;
+}
+
+/* mermaid flow figure */
+
+.flowwrap {
+  margin: 2.5rem 0 0;
+  padding: 1.6rem 1.6rem 1rem;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.fbox {
+  font: 400 0.8rem var(--mono);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  background: #fff;
+}
+
+.fbox.file {
+  background: var(--code-bg);
+}
+
+.farrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.flbl {
+  font: 500 0.66rem var(--mono);
+  background: var(--mark);
+  border-radius: 2px;
+  padding: 0.08rem 0.45rem;
+}
+
+.fline {
+  position: relative;
+  width: 3.4rem;
+  height: 1px;
+  background: var(--ink);
+}
+
+.fline::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  top: -3px;
+  border: 3.5px solid transparent;
+  border-left: 6px solid var(--ink);
+}
+
+.flow-cap {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.1rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--hairline);
+  font: 400 0.72rem var(--mono);
+  color: var(--muted);
+  opacity: 0.75;
+}
+
+/* red pen figure */
+
+.annot {
+  position: relative;
+  margin: 2.5rem 0 0;
+  padding: 1.6rem 1.6rem 1.8rem;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.annot p {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.circ {
+  position: relative;
+  white-space: nowrap;
+}
+
+.circ svg {
+  position: absolute;
+  left: -0.45em;
+  top: -0.3em;
+  width: calc(100% + 0.9em);
+  height: calc(100% + 0.65em);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.circ path {
+  fill: none;
+  stroke: #ff4f2e;
+  stroke-width: 3;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.darrow {
+  position: absolute;
+  left: 50%;
+  top: 3rem;
+  width: 2.4rem;
+  height: 1.9rem;
+}
+
+.darrow path {
+  fill: none;
+  stroke: #ff4f2e;
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0.3;
+}
+
+/* hot reload figure */
+
+.duo {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  flex-wrap: wrap;
+  margin: 2.5rem 0 0;
+}
+
+.chip {
+  font: 400 0.82rem var(--mono);
+  background: var(--code-bg);
+  border-radius: 8px;
+  padding: 0.5rem 0.85rem;
+}
+
+.darr {
+  color: var(--muted);
+  font: 400 1.1rem var(--mono);
+}
+
+.miniwin {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 6px 18px -8px rgba(26, 27, 30, 0.3);
+  padding: 0.45rem 0.8rem;
+  font: 400 0.78rem var(--mono);
+  color: var(--muted);
+}
+
+.mini-lights {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.mini-lights i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--hairline);
+}
+
+.mini-lights i:first-child {
+  background: #f26d5f;
+}
+
+.mini-lights i:nth-child(2) {
+  background: #f5bd4f;
+}
+
+.mini-lights i:nth-child(3) {
+  background: #58c274;
+}
+
+/* start screen chips */
+
+.cloud {
+  position: relative;
+  height: 16rem;
+  margin: 2.5rem 0 0;
+}
+
+.fchip {
+  position: absolute;
+  font: 400 0.82rem var(--mono);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: #fff;
+  padding: 0.4rem 0.85rem;
+  box-shadow: 0 4px 10px -6px rgba(26, 27, 30, 0.25);
+}
+
+.fchip.lift {
+  border-color: #d8d8d2;
+  box-shadow: 0 18px 32px -14px rgba(26, 27, 30, 0.4);
+  scale: 1.06;
+}
+
+.cloud .fchip:nth-child(1) { left: 4%; top: 16%; rotate: -4deg; }
+.cloud .fchip:nth-child(2) { left: 24%; top: 4%; rotate: 2deg; }
+.cloud .fchip:nth-child(3) { left: 54%; top: 10%; rotate: -2deg; }
+.cloud .fchip:nth-child(4) { left: 78%; top: 6%; rotate: 4deg; }
+.cloud .fchip:nth-child(5) { left: 5%; top: 60%; rotate: 3deg; }
+.cloud .fchip:nth-child(6) { left: 36%; top: 44%; rotate: -3deg; }
+.cloud .fchip:nth-child(7) { left: 63%; top: 62%; rotate: 5deg; }
+.cloud .fchip:nth-child(8) { left: 80%; top: 36%; rotate: -6deg; }
+
+/* feature rows */
+
+.rows {
+  display: grid;
+  grid-template-columns: 9.5rem 1fr;
+  margin: 1.5rem 0 0;
+}
+
+.rows dt {
   font-weight: 600;
+  padding: 0.9rem 1rem 0.9rem 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.rows dd {
+  margin: 0;
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--hairline);
 }
 
 /* steps */
@@ -577,24 +902,70 @@ details p {
   color: var(--muted);
 }
 
-.footer a {
-  color: inherit;
-}
-
 /* ---------- responsive ---------- */
+
+@media (max-width: 800px) {
+  .steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .steps li:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+}
 
 @media (max-width: 640px) {
   .hero {
     padding-top: 3.5rem;
   }
 
+  .nav {
+    padding: 1rem 1.25rem;
+  }
+
+  .nav nav {
+    gap: 1rem;
+  }
+
+  .nav nav a.hide-sm {
+    display: none;
+  }
+
   .sidebar {
     display: none;
   }
 
-  .rows li {
-    flex-direction: column;
-    gap: 0.2rem;
+  .tab {
+    padding: 0.45rem 0.55rem;
+    font-size: 0.72rem;
+  }
+
+  .tab .unsaved {
+    margin-left: 0.3em;
+  }
+
+  .slash-pop {
+    right: 1rem;
+  }
+
+  .fline {
+    width: 2.2rem;
+  }
+
+  .cloud {
+    height: 12rem;
+  }
+
+  .rows {
+    grid-template-columns: 1fr;
+  }
+
+  .rows dt {
+    padding-bottom: 0.15rem;
+  }
+
+  .rows dd {
+    padding-top: 0.15rem;
   }
 
   .steps {
@@ -604,11 +975,6 @@ details p {
   .free-row {
     flex-direction: column;
     gap: 1.5rem;
-  }
-
-  .nav nav a[href="#edit"],
-  .nav nav a[href="#files"] {
-    display: none;
   }
 }
 

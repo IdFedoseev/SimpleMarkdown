@@ -6,7 +6,7 @@
     <title>Reader — Markdown, already rendered</title>
     <meta
       name="description"
-      content="Reader for macOS opens .md files as finished documents — and lets you edit the page itself, Notion-style. Free and open source."
+      content="Reader for macOS opens .md files as finished documents, edits them in place — Notion-style — and keeps everything in tabs. Free and open source."
     />
     <link
       rel="icon"
@@ -25,6 +25,8 @@
       <a class="brand" href="#top">Reader<span class="brand-ext">.md</span></a>
       <nav>
         <a href="#edit">Edit</a>
+        <a class="hide-sm" href="#tabs">Tabs</a>
+        <a class="hide-sm" href="#mermaid">Diagrams</a>
         <a href="#files">Files</a>
         <a href="#download">Download</a>
         <a href="https://github.com/IdFedoseev/SimpleMarkdown" target="_blank" rel="noopener">GitHub</a>
@@ -36,8 +38,8 @@
         <h1>Open Markdown.<br />See a document.</h1>
         <p class="lede">
           Reader for macOS renders <code>.md</code> files the moment they open — no raw syntax, no
-          preview toggle. Need a change? Edit the page itself, Notion-style, and it saves back to
-          plain Markdown. Free and open source.
+          preview toggle. Need a change? Edit the page itself, Notion-style; it saves back to clean
+          Markdown. Files live in tabs, like a browser. Free and open source.
         </p>
         <p class="cta-row">
           <a class="btn btn-primary" href="https://github.com/IdFedoseev/SimpleMarkdown/releases"
@@ -49,84 +51,203 @@
         </p>
 
         <figure class="window">
-          <div class="chrome">
-            <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
-            <span class="wtitle"><i class="unsaved" title="Unsaved changes"></i>release-notes.md</span>
+          <div class="chrome" aria-hidden="true">
+            <span class="lights"><i></i><i></i><i></i></span>
+            <span class="wtitle">readme.md</span>
+          </div>
+          <div class="tabbar" aria-hidden="true">
+            <span class="tab active">readme.md<i class="unsaved" id="autosave-dot"></i></span>
+            <span class="tab">meeting-notes.md</span>
+            <span class="tab">untitled</span>
           </div>
           <div class="window-body">
             <aside class="sidebar" aria-hidden="true">
               <span class="side-label">notes/</span>
-              <span>readme.md</span>
-              <span class="active">release-notes.md</span>
+              <span class="active">readme.md</span>
+              <span>meeting-notes.md</span>
               <span>roadmap.md</span>
               <span>todo.txt</span>
             </aside>
             <div class="stage" id="stage">
               <pre class="layer raw" id="raw" aria-hidden="true"></pre>
-              <article class="layer rendered">
-                <h3>Release notes</h3>
-                <p><strong>Reader 1.0</strong> is out.</p>
+              <article class="layer rendered" aria-hidden="true">
+                <h3>Why Markdown won</h3>
+                <p>One format, twenty years of notes, zero lock-in.</p>
                 <ul>
-                  <li>Opens <code>.md</code> as a document</li>
-                  <li>Edit text <mark>in place</mark></li>
-                  <li>Free, MIT</li>
+                  <li>Readable as plain text</li>
+                  <li>Rendered, it reads even better</li>
+                  <li>Now editable <mark>in place</mark></li>
                 </ul>
                 <blockquote>No raw markdown. Ever.</blockquote>
               </article>
-              <button class="replay" id="replay" type="button" title="Replay">↻</button>
+              <button class="replay" id="replay" type="button" aria-label="Replay demo" title="Replay">↻</button>
             </div>
           </div>
         </figure>
       </section>
 
       <section class="section" id="edit">
-        <h2>Edit the page, not the source</h2>
+        <h2><span class="h2-prefix" aria-hidden="true">##</span> Edit the page, not the source</h2>
         <p>
           Select any text and a toolbar appears — bold, italics, code, links. Type
-          <code>/</code> for a menu of blocks. What you touch is the finished document; what lands
-          on disk is still clean Markdown. The round-trip is lossless.
+          <code>/</code> for a menu of blocks: headings, lists, quotes, code. What you touch is the
+          finished document; what lands on disk is clean Markdown — the same syntax you would have
+          typed by hand.
         </p>
         <figure class="inline-edit" aria-hidden="true">
           <div class="mini-toolbar">
             <span><b>B</b></span><span><i>I</i></span><span><code>`</code></span><span>Link</span>
           </div>
+          <div class="slash-pop">
+            <span class="sp-head">/</span>
+            <span class="sp-item">Heading<i>H2</i></span>
+            <span class="sp-item">List<i>•</i></span>
+            <span class="sp-item">Quote<i>&gt;</i></span>
+            <span class="sp-item">Code<i>{ }</i></span>
+          </div>
           <p>The quick brown fox fixes a <mark>typo</mark> in place.</p>
+          <p class="card-note">The file on disk never notices.</p>
+        </figure>
+      </section>
+
+      <section class="section" id="tabs">
+        <h2><span class="h2-prefix" aria-hidden="true">##</span> Every file gets a tab</h2>
+        <p>
+          Every open file gets a tab. Jump with <kbd>⌘1</kbd>…<kbd>⌘9</kbd> — nine always means the
+          last tab, however many you have. Cycle with <kbd>⌘⌥←</kbd>/<kbd>⌘⌥→</kbd> or
+          <kbd>Ctrl+Tab</kbd>. Close with <kbd>⌘W</kbd> or a middle-click, the civilized way.
+        </p>
+        <p>
+          Quit and reopen: the session comes back. Switch away and back — each tab stays scrolled
+          to where you stopped. Untitled
+          notes are the one exception — unsaved things don't survive restarts. Press
+          <kbd>⌘N</kbd> for a fresh one; it lives in memory across tab switches until the save
+          dialog gives it a filename. A dot on a tab means unsaved edits. Autosave clears it before
+          you've worried.
+        </p>
+        <figure class="tabstrip" aria-hidden="true">
+          <div class="tabbar">
+            <span class="tab active">readme.md</span>
+            <span class="tab">meeting-notes.md<i class="unsaved on"></i></span>
+            <span class="tab">untitled</span>
+          </div>
+          <div class="skel"><i></i><i></i></div>
+        </figure>
+      </section>
+
+      <section class="section" id="mermaid">
+        <h2><span class="h2-prefix" aria-hidden="true">##</span> Diagrams live in the page</h2>
+        <p>
+          A <code>mermaid</code> block renders as the diagram it describes. The code stays hidden;
+          the picture takes its place in the document. Click the ⤢ icon on it for a fullscreen
+          viewer: zoom with
+          the wheel, the buttons, or a double-click; pan by dragging; <kbd>Esc</kbd> to get out.
+          Zoom runs 5% to 2000%. The viewer follows your system theme, dark included.
+        </p>
+        <figure class="flowwrap" aria-hidden="true">
+          <div class="flow">
+            <span class="fbox file">file.md</span>
+            <span class="farrow"><span class="flbl">open</span><span class="fline"></span></span>
+            <span class="fbox doc">document</span>
+            <span class="farrow"><span class="flbl">edit in place</span><span class="fline"></span></span>
+            <span class="fbox file">file.md</span>
+          </div>
+          <div class="flow-cap"><span>```mermaid</span><span>show code</span></div>
+        </figure>
+      </section>
+
+      <section class="section" id="draw">
+        <h2><span class="h2-prefix" aria-hidden="true">##</span> Red pen, self-erasing</h2>
+        <p>
+          Press <kbd>⌘D</kbd> — or the draw button — and sketch directly over the page. Red strokes
+          on top of the document; nothing is written to the file. Made for pointing at things: a
+          screen share, a review, a lively argument. Each stroke fades on its own after a timeout
+          you pick — 3, 5, 10, 30, or 60 seconds. Five by default. Point, explain, let it
+          disappear.
+        </p>
+        <figure class="annot" aria-hidden="true">
+          <p>
+            Nothing here is permanent — not even
+            <span class="circ">this circle<svg viewBox="0 0 100 44" preserveAspectRatio="none"><path d="M12 24 C 20 6, 78 4, 90 18 C 97 28, 88 40, 52 41 C 20 42, 5 36, 12 24" /></svg></span>.
+          </p>
+          <svg class="darrow" viewBox="0 0 40 30"><path d="M36 26 C 26 12, 14 8, 6 12" /><path d="M6 12 l7.5 -1.5 M6 12 l2.5 6.5" /></svg>
+        </figure>
+      </section>
+
+      <section class="section" id="live">
+        <h2><span class="h2-prefix" aria-hidden="true">##</span> Hot reload for documents</h2>
+        <p>
+          Edits save themselves 700 ms after you stop typing (an untitled note waits for its
+          first <kbd>⌘S</kbd>). <kbd>⌘S</kbd> works too, if you enjoy
+          pressing it. An unsaved dot in the title bar keeps the score. Meanwhile, files changed
+          elsewhere — <code>git pull</code>, another editor, a script — appear within about two
+          seconds, or the moment the window regains focus. External updates never overwrite your
+          unsaved edits.
+        </p>
+        <figure class="duo" aria-hidden="true">
+          <span class="chip">$ git pull</span>
+          <span class="darr">→</span>
+          <span class="miniwin"><span class="mini-lights"><i></i><i></i><i></i></span>readme.md</span>
+        </figure>
+      </section>
+
+      <section class="section" id="start">
+        <h2><span class="h2-prefix" aria-hidden="true">##</span> A start screen with physics</h2>
+        <p>
+          No document open? Reader shows your recent files — up to twelve — as a loose cloud of
+          chips. Drag them around; they bump, drift, and settle. A physics toy that doubles as a
+          file picker. Click a chip and you are back in the document.
+        </p>
+        <figure class="cloud" aria-hidden="true">
+          <span class="fchip">readme.md</span>
+          <span class="fchip">meeting-notes.md</span>
+          <span class="fchip">roadmap.md</span>
+          <span class="fchip">todo.txt</span>
+          <span class="fchip">thesis-draft.md</span>
+          <span class="fchip lift">recipes.md</span>
+          <span class="fchip">standup.md</span>
+          <span class="fchip">ideas.md</span>
         </figure>
       </section>
 
       <section class="section" id="files">
-        <h2>Whole folders, one window</h2>
+        <h2><span class="h2-prefix" aria-hidden="true">##</span> Everything one keystroke away</h2>
         <p>Drop a file or an entire folder anywhere on the window.</p>
-        <ul class="rows">
-          <li>
-            <span class="term">Sidebar browsing</span>
-            <span>every file one click away; <kbd>⌘\</kbd> hides it when you want width.</span>
-          </li>
-          <li>
-            <span class="term">Search</span>
-            <span><kbd>⌘F</kbd> highlights every match with a counter and next/prev; <kbd>Esc</kbd> closes.</span>
-          </li>
-          <li>
-            <span class="term">Autosave</span>
-            <span>changes save themselves — an unsaved dot in the title bar tells the truth.</span>
-          </li>
-          <li>
-            <span class="term">System default</span>
-            <span>make Reader the editor for Markdown files; double-click just works.</span>
-          </li>
-          <li>
-            <span class="term">Formats</span>
-            <span><code>.md</code>, <code>.markdown</code>, <code>.mdown</code>, <code>.mkd</code>, <code>.txt</code>.</span>
-          </li>
-        </ul>
+        <dl class="rows">
+          <dt>Open</dt>
+          <dd>
+            <kbd>⌘O</kbd> for a file, <kbd>⌘⇧O</kbd> for a folder. Drag-and-drop accepts either,
+            anywhere on the window.
+          </dd>
+          <dt>New note</dt>
+          <dd><kbd>⌘N</kbd> opens an untitled note; the save dialog gives it a home.</dd>
+          <dt>Sidebar</dt>
+          <dd>every file in the open folder one click away; <kbd>⌘\</kbd> hides it when you want width.</dd>
+          <dt>Search</dt>
+          <dd>
+            <kbd>⌘F</kbd> highlights every match with an N/M counter; <kbd>Enter</kbd>,
+            <kbd>⌘G</kbd> or <kbd>F3</kbd> for next, <kbd>⇧</kbd> for previous, <kbd>Esc</kbd> to
+            close. Highlights update live while you edit.
+          </dd>
+          <dt>System default</dt>
+          <dd>
+            Make Reader the default app for Markdown once; double-clicking in Finder opens files in
+            it.
+          </dd>
+          <dt>Formats</dt>
+          <dd>
+            <code>.md</code>, <code>.markdown</code>, <code>.mdown</code>, <code>.mkd</code> —
+            editable. <code>.txt</code> — view only.
+          </dd>
+        </dl>
       </section>
 
       <section class="section" id="steps">
-        <h2>Three steps to your first document</h2>
+        <h2><span class="h2-prefix" aria-hidden="true">##</span> Three steps to your first document</h2>
         <ol class="steps">
           <li>
             <h3>Drop any <code>.md</code> file onto Reader</h3>
-            <p>Or press <kbd>⌘O</kbd>, or just double-click it in Finder.</p>
+            <p>Or press <kbd>⌘O</kbd>. Double-click works too, once Reader is the default Markdown app.</p>
           </li>
           <li>
             <h3>It opens rendered</h3>
@@ -134,19 +255,19 @@
           </li>
           <li>
             <h3>Click into the text and type</h3>
-            <p>That is the whole tutorial.</p>
+            <p>The file saves itself. That is the whole tutorial.</p>
           </li>
         </ol>
       </section>
 
-      <section class="section free" id="download">
-        <h2>Free, open source, forever</h2>
+      <section class="section" id="download">
+        <h2><span class="h2-prefix" aria-hidden="true">##</span> Free, open source, forever</h2>
         <div class="free-row">
           <p class="price">$0</p>
           <div>
             <p>
               No price tag, no trial timer, no locked features. Reader is MIT-licensed and
-              lightweight: the source is on GitHub, and builds live in Releases.
+              lightweight: the source is on GitHub, and Mac builds will live in Releases.
             </p>
             <p class="cta-row">
               <a class="btn btn-primary" href="https://github.com/IdFedoseev/SimpleMarkdown/releases"
@@ -161,7 +282,7 @@
       </section>
 
       <section class="section" id="faq">
-        <h2>Questions</h2>
+        <h2><span class="h2-prefix" aria-hidden="true">##</span> Questions</h2>
         <details>
           <summary>How is Reader different from other Markdown viewers?</summary>
           <p>
@@ -172,17 +293,29 @@
         <details>
           <summary>Will it mangle my files?</summary>
           <p>
-            No. The editor round-trips Markdown — formatting is stored as the same syntax you
-            would type by hand.
+            No. Edits are saved back as clean, standard Markdown — the syntax you would type by
+            hand. Reader is also a young app, so keep git or Time Machine around for anything
+            precious.
+          </p>
+        </details>
+        <details>
+          <summary>Can it edit plain text files?</summary>
+          <p>
+            No. <code>.txt</code> files open view-only. The editable formats are
+            <code>.md</code>, <code>.markdown</code>, <code>.mdown</code>, and <code>.mkd</code>.
           </p>
         </details>
         <details>
           <summary>What does it cost?</summary>
-          <p>Nothing. MIT license, forever.</p>
+          <p>Nothing. MIT license, forever. No trial, no locked features, no subscription.</p>
         </details>
         <details>
           <summary>Which systems does it run on?</summary>
-          <p>macOS. Reader is lightweight — it opens instantly and stays out of the way.</p>
+          <p>macOS only.</p>
+        </details>
+        <details>
+          <summary>What about Windows or Linux?</summary>
+          <p>Not today. The license lets anyone try to change that; watch GitHub if you care to.</p>
         </details>
       </section>
     </main>
